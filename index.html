@@ -630,27 +630,24 @@ function initAnalytics() {
 // CLAUDE API HELPER
 // ═══════════════════════════════════════════════════════
 async function callClaude(messages, systemPrompt) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
-  'Content-Type': 'application/json',
-  'anthropic-dangerous-direct-browser-access': 'true'
-},
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer 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'
+    },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'llama-3.3-70b-versatile',
       max_tokens: 1000,
-      system: systemPrompt,
-      messages: messages
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages
+      ]
     })
   });
   const data = await response.json();
   if (data.error) throw new Error(data.error.message);
-  return data.content[0].text;
-}
-
-// ═══════════════════════════════════════════════════════
-// AI AGENT — реальный Claude API
-// ═══════════════════════════════════════════════════════
+  return data.choices[0].message.content;
 const agentSystemPrompt = `Ты — NexusAI Агент, экспертный AI-аналитик рынков стартапов и технологий. 
 Ты работаешь на платформе NexusAI — инструменте для анализа рынка. 
 Отвечай только на русском языке. 
